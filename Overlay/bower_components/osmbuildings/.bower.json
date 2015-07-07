@@ -1,0 +1,14 @@
+{
+  "name": "osmbuildings",
+  "main": "dist/OSMBuildings-Leaflet.js",
+  "homepage": "https://github.com/kekscom/osmbuildings",
+  "_release": "7277c19032",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "7277c190320fb910d9a4076c3230c4a4a48150b6"
+  },
+  "_source": "git://github.com/kekscom/osmbuildings.git",
+  "_target": "*",
+  "_originalSource": "osmbuildings"
+}

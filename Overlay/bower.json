@@ -1,0 +1,13 @@
+{
+  "name": "Map Vizualisation",
+  "dependencies": {
+    "jquery": ">= 1.9.1",
+    "osmbuildings": "*",
+    "leaflet":"*",
+    "chroma-js":"*",
+    "angular":"*",
+    "angular-leaflet-directive":"",
+    "world-flags-sprite":"*",
+    "Leaflet.utfgrid": "danzel/Leaflet.utfgrid"
+  }
+}
