@@ -147,9 +147,11 @@
         Add the 3D shapes.
     */
 
+    var osmb;
+
     leafletData.getMap().then(function(map) {
 
-        var osmb = new OSMBuildings(map).set(geoJSON);
+       
     });
 
     /*
@@ -187,13 +189,21 @@
                                     });
 
             leafletData.getMap().then(function(map) {
+                //add heatmap 
                 map.addLayer(heatLayer);
                 heatLayer.setData({data:heatData});
+                //don't show heatmap from the beginning (we still had to add it to 'init')
                 map.removeLayer(heatLayer);
+
+                //add markers
                 map.addLayer(markerLayer); 
 
+                //add shadow layer
                 shadowLayer.setData(shadowData);
                 map.addLayer(shadowLayer);
+
+                //add 3D layer
+                osmb = new OSMBuildings(map).set(geoJSON);
             });
 
     }}).error(function() {});
@@ -206,14 +216,30 @@
         L.easyButton('fa fa-mobile fa-2x', function(btn, map){
           map.removeLayer(shadowLayer);
           map.addLayer(heatLayer);
+
+          //don't let the 3D layer to be hidden behind the heatmap
+          bring3DToFront(map);
+          //make the heatlayer click-through
           $(".leaflet-zoom-hide").css("pointer-events", "none");
         }).addTo( map ); 
 
         L.easyButton('fa fa-star-half-o fa-2x', function(btn, map){
           map.addLayer(shadowLayer);
           map.removeLayer(heatLayer);
+
+          //don't let the 3D layer to be hidden behind the shadow
+          bring3DToFront(map);
         }).addTo( map ); 
     });
+
+    function bring3DToFront(map){
+        /*
+            Maybe there is a better way. bringToFront() doesn't seem to work here.
+            Removing and adding works.
+        */
+        map.removeLayer(osmb);
+        map.addLayer(osmb);
+    }
 
 
     /*
@@ -270,7 +296,7 @@
             opacity: 1,
             color: 'white',
             dashArray: '3',
-            fillOpacity: 0.1
+            fillOpacity: 0.8
         };
     }
 
