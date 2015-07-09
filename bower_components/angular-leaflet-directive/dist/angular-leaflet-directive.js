@@ -1837,7 +1837,8 @@ angular.module("leaflet-directive").factory('leafletMapDefaults', ["$q", "leafle
                 touchZoom: d.touchZoom,
                 attributionControl: d.attributionControl,
                 worldCopyJump: d.worldCopyJump,
-                crs: d.crs
+                crs: d.crs,
+                drawControl: false
             };
 
             if (isDefined(d.minZoom)) {
@@ -2030,7 +2031,7 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', ["$rootScop
     };
 
     var _deleteMarker = function (marker, map, layers) {
-        marker.closePopup();
+        //marker.closePopup();
         // There is no easy way to know if a marker is added to a layer, so we search for it
         // if there are overlays
         if (isDefined(layers) && isDefined(layers.overlays)) {
@@ -2156,7 +2157,7 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', ["$rootScop
                     // Remove from the layer group that is supposed to be
                     if (isDefined(layers.overlays[oldMarkerData.layer]) && layers.overlays[oldMarkerData.layer].hasLayer(marker)) {
                         layers.overlays[oldMarkerData.layer].removeLayer(marker);
-                        marker.closePopup();
+                        //marker.closePopup();
                     }
                     // Test if it is not on the map and add it
                     if (!map.hasLayer(marker)) {
@@ -2175,7 +2176,7 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', ["$rootScop
                 if (isString(oldMarkerData.layer) && isDefined(layers.overlays[oldMarkerData.layer]) && layers.overlays[oldMarkerData.layer].hasLayer(marker)) {
                     layers.overlays[oldMarkerData.layer].removeLayer(marker);
                 }
-                marker.closePopup();
+                //marker.closePopup();
 
                 // Remove it from the map in case the new layer is hidden or there is an error in the new layer
                 if (map.hasLayer(marker)) {
@@ -2226,7 +2227,7 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', ["$rootScop
                 if (isObject(oldMarkerData.icon)) {
                     // If there was an icon before restore to the default
                     marker.setIcon(createLeafletIcon());
-                    marker.closePopup();
+                    //marker.closePopup();
                     marker.unbindPopup();
                     if (isString(markerData.message)) {
                         marker.bindPopup(markerData.message, markerData.popupOptions);
@@ -2243,7 +2244,7 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', ["$rootScop
                 if (dragG) {
                     marker.dragging.enable();
                 }
-                marker.closePopup();
+                //marker.closePopup();
                 marker.unbindPopup();
                 if (isString(markerData.message)) {
                     marker.bindPopup(markerData.message, markerData.popupOptions);
@@ -2252,7 +2253,7 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', ["$rootScop
 
             // Update the Popup message property
             if (!isString(markerData.message) && isString(oldMarkerData.message)) {
-                marker.closePopup();
+                //marker.closePopup();
                 marker.unbindPopup();
             }
 
@@ -2289,7 +2290,7 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', ["$rootScop
             var updatedFocus = false;
             if (markerData.focus !== true && oldMarkerData.focus === true) {
                 // If there was a focus property and was true we turn it off
-                marker.closePopup();
+                //marker.closePopup();
                 updatedFocus = true;
             }
 

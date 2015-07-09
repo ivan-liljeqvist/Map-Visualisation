@@ -7,43 +7,94 @@
 	<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
 	<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
 	<link rel="stylesheet" href="bower_components/world-flags-sprite/stylesheets/flags32.css" />
+	<link rel="stylesheet" href="bower_components/leaflet-dist/leaflet.css" />
+	<link rel="stylesheet" href="bower_components/leaflet-draw/dist/leaflet.draw.css" />
+	<link rel="stylesheet" href="bower_components/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css" />
+	<link rel="stylesheet" href="bower_components/vis/dist/vis.min.css" />
 	<!-- endbower -->
 	<!--bower dependencies without bower meta -->
 	<link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css"></script>
 	<link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css"></script>
 	<!--endbower dependencies without bower meta-->
 
+	<link rel="stylesheet" href="bower_components/sidebar-v2/css/leaflet-sidebar.css"></script>
 	<link rel="stylesheet" href="css/style.css" />
+	<link rel="stylesheet" href="css/leaflet-timeline.css" />
     
 </head>
 <body>
 
+	
 
 	<!--wrapper controller element -->
 	<div id="map_canvas" ng-controller="MapController">
+	<div id="sidebar" class="sidebar collapsed">
+        <!-- Nav tabs -->
+        <ul class="sidebar-tabs" role="tablist">
+            <li><a href="#home" id="homeTab" role="tab"><i class="fa fa-bars"></i></a></li>
+            <li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
+            <li><a href="#messages" role="tab"><i class="fa fa-envelope"></i></a></li>
+            <li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="sidebar-content active">
+            <div class="sidebar-pane" id="home">
+                <h1>{{ selectedCountry.properties.name || 'No country'}}</h1>
+
+                <p class="lorem">{{ selectedCountry.properties.name || 'No country'}} is awesome</p>
+                
+            </div>
+            <!--
+            <div class="sidebar-pane" id="profile"><h1>Profile</h1></div>
+            <div class="sidebar-pane" id="messages"><h1>Messages</h1></div>
+            <div class="sidebar-pane" id="settings"><h1>Settings</h1></div>
+        	-->
+        </div>
+    </div>
+
 		<!--map object -->
-		<leaflet center="center" layers="layers" events="events" legend="legend" geojson="geojson" defaults="defaults"></leaflet>
+		<leaflet center="center" 
+				 layers="layers" 
+				 events="events" 
+				 legend="legend" 
+				 geojson="geojson" 
+				 defaults="defaults">
+		 </leaflet>
 	
 		<!--country name popup -->
-		<<div class="info worldmap country f32">
+		<div id="timeline"></div>
+		<div class="info worldmap country f32">
         <div ng-show="selectedCountry" class="flag" ng-class="countries[selectedCountry.id]['alpha-2']|lowercase"></div>
         {{ selectedCountry.properties.name || 'No country'}}
+
+
       </div>
     </div>
 
 	<!-- bower:js -->
-	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="bower_components/jquery/jquery.js"></script>
 	<script src="bower_components/leaflet/dist/leaflet.js"></script>
 	<script src="bower_components/leaflet/dist/leaflet-src.js"></script>
 	<script src="bower_components/chroma-js/chroma.js"></script>
 	<script src="bower_components/angular/angular.js"></script>
 	<script src="bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.js"></script>
 	<script src="bower_components/Leaflet.utfgrid/dist/leaflet.utfgrid.js"></script>
+	<script src="bower_components/leaflet-dist/leaflet.js"></script>
+	<script src="bower_components/leaflet-draw/dist/leaflet.draw-src.js"></script>
+	<script src="bower_components/LeafletPlayback/dist/LeafletPlayback.js"></script>
+	<script src="bower_components/Leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
+	<script src="bower_components/vis/dist/vis.min.js"></script>
+	<script src="bower_components/moment/moment.js"></script>
+	<script src="bower_components/sidebar-v2/js/jquery-sidebar.js"></script>
+	<script src="bower_components/sidebar-v2/js/leaflet-sidebar.js"></script>
 	<!-- endbower -->
 	<!--bower dependencies without bower meta -->
 	<script src="bower_components/osmbuildings/dist/OSMBuildings-Leaflet.debug.js"></script>
 	<script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 	<!--endbower dependencies without bower meta-->
+	
+	<script src="geo/tracks.js"></script>
 	
 	<!--main app module -->
 	<script src="js/app.js"></script>
@@ -53,8 +104,13 @@
 	<!--shadow layer dependencies-->
 	<script src="js/leaflet-plugins/layers/shadow/QuadTree.js"></script>
 	<script src="js/leaflet-plugins/layers/shadow/L.TileLayer.MaskCanvas.js"></script>
+	<script src="js/leaflet-plugins/timeline/leaflet.timeline.js"></script>
 	<!--buttons on left side dependency -->
 	<script src="js/leaflet-plugins/easy-button.js"></script>
+
+	<!--timeline tracks data -->
+	<!--<script src="http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/.geojsonp"></script>-->
+
 
 </body>
 </html>

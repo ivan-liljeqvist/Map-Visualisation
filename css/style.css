@@ -76,3 +76,25 @@
     .leaflet-heatmap-layer{
       pointer-events:none;
     }
+
+    #timeline { 
+        height: 120px; 
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color:rgba(0,0,0,0.5);
+    }
+
+    .vis.timeline .timeaxis .text {
+      color:white;
+      font-family: Helvetica Neue;
+    }
+
+  .leaflet-bottom .leaflet-control {
+    margin-bottom:140px;
+  }
+    .datetimeControl p {
+        margin: 0;
+        font-size: 16px;
+    }

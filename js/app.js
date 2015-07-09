@@ -7,7 +7,7 @@
     */
 
     var geoJSON;
-    var osmb;
+    var three_d_layer;
 
     /*
         Colors that will be used to color the countries.
@@ -66,13 +66,28 @@
         }
     };
 
+    var heatLayer = new HeatmapOverlay(heatmap_config);
+    var markerLayer = new L.MarkerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: true, zoomToBoundsOnClick: true });
+    var shadowLayer = L.TileLayer.maskCanvas({
+                           radius: 80000,  // radius in pixels or in meters (see useAbsoluteRadius)
+                           useAbsoluteRadius: true,  // true: r in meters, false: r in pixels
+                           color: '#000',  // the color of the layer
+                           opacity: 0.5,  // opacity of the not covered area
+                           noMask: false,  // true results in normal (filled) circled, instead masked circles
+                           lineColor: '#A00'   // color of the circle outline if noMask is true
 
+                       });
+    var heatData=[];
+    var shadowData=[];
 
     /*
         Default data in the scope.
     */
 
     angular.extend($scope, {
+        defaults:{
+            closePopupOnClick: false
+        },
         center: {
             lat: 32.50440,
             lng: 23.33522,
@@ -90,8 +105,12 @@
                     type: 'xyz'
                 }
             }
+        },
+        controls: {
+            draw: {}
         }
     });
+
 
     /*
         Load 3D data.
@@ -104,6 +123,14 @@
         initLayers();
         //init buttons on the left side
         initLayerButtons();
+        initDrawControlls();
+
+        leafletData.getMap().then(function(map) {
+            var sidebar = L.control.sidebar('sidebar').addTo(map);
+        });
+    
+        initTimelineFirstVersion();
+        
     });
 
     /*
@@ -111,20 +138,6 @@
     */
 
     function initLayers(){
-        var heatLayer = new HeatmapOverlay(heatmap_config);
-        var heatData=[];
-        var shadowData=[];
-
-        var markerLayer = new L.MarkerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: true, zoomToBoundsOnClick: true });
-        var shadowLayer = L.TileLayer.maskCanvas({
-                           radius: 80000,  // radius in pixels or in meters (see useAbsoluteRadius)
-                           useAbsoluteRadius: true,  // true: r in meters, false: r in pixels
-                           color: '#000',  // the color of the layer
-                           opacity: 0.5,  // opacity of the not covered area
-                           noMask: false,  // true results in normal (filled) circled, instead masked circles
-                           lineColor: '#A00'   // color of the circle outline if noMask is true
-
-                       });
 
         $.ajax({
             dataType: "json",
@@ -140,7 +153,9 @@
 
                                 });
 
-                leafletData.getMap().then(function(map) {
+        leafletData.getMap().then(function(map) {
+            map.options.closePopupOnClick = false;
+
             //add heatmap 
             map.addLayer(heatLayer);
             heatLayer.setData({data:heatData});
@@ -153,9 +168,17 @@
             //add shadow layer
             shadowLayer.setData(shadowData);
             map.addLayer(shadowLayer);
+            //don't show shadowlayer from the beginning (we still had to add it to 'init')
+            map.removeLayer(shadowLayer);
 
             //add 3D layer
-            osmb = new OSMBuildings(map).set(geoJSON);
+            three_d_layer = new OSMBuildings(map).set(geoJSON);
+
+            bring3DToFront();
+
+             
+
+                    
         });
 
         }}).error(function() {});
@@ -166,25 +189,94 @@
     */
 
     function initLayerButtons(){
-        leafletData.getMap().then(function(map) {
-            L.easyButton('fa fa-mobile fa-2x', function(btn, map){
-            map.removeLayer(shadowLayer);
-            map.addLayer(heatLayer);
 
-            //don't let the 3D layer to be hidden behind the heatmap
-            bring3DToFront();
-            //make the heatlayer click-through
-            $(".leaflet-zoom-hide").css("pointer-events", "none");
-        }).addTo( map ); 
+            leafletData.getMap().then(function(map) {
+                L.easyButton('fa fa-mobile fa-2x', function(btn, map){
+                map.removeLayer(shadowLayer);
+                map.addLayer(heatLayer);
 
-        L.easyButton('fa fa-star-half-o fa-2x', function(btn, map){
+                //don't let the 3D layer to be hidden behind the heatmap
+                bring3DToFront();
+                //make the heatlayer click-through
+                $(".leaflet-zoom-hide").css("pointer-events", "none");
+            }).addTo( map ); 
+
+            L.easyButton('fa fa-star-half-o fa-2x', function(btn, map){
                 map.addLayer(shadowLayer);
                 map.removeLayer(heatLayer);
 
                 //don't let the 3D layer to be hidden behind the shadow
                 bring3DToFront();
             }).addTo( map ); 
+
+            L.easyButton('fa fa-star-half-o fa-2x', function(btn, map){
+                map.removeLayer(shadowLayer);
+                map.removeLayer(heatLayer);
+
+                //don't let the 3D layer to be hidden behind the shadow
+                bring3DToFront();
+            }).addTo( map );
+
         });
+    }
+
+    function savenote(){
+        console.log("save button pressed!");
+    }
+
+    function initDrawControlls(){
+
+        leafletData.getMap().then(function(map) {
+
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+           
+            map.on('draw:created', function (e) {
+                var layer = e.layer;
+
+                /* quick and dirty element insertion.  */
+
+                var popup = L.popup()
+                .setContent("<center>Bad coverage.<br><br><input type='text' placeholder='Add a note'></input><br><br><button class='savebutton' onclick='alert(\"test\")'>Save</button><br></center>");
+
+
+                layer.bindPopup(popup);
+                drawnItems.addLayer(layer);
+                drawnItems.bringToBack();
+                
+                /*
+                    Open the popup when an area has been marked.
+                    OBS: this needs to be called after the area is added to the screen.
+                */
+                layer.openPopup();
+            });
+
+            map.on('draw:deleted', function (e) {
+                drawnItems.removeLayer(e.layer);
+                console.log("removing layer");
+                console.log(e.layer);
+            });
+
+
+            // Initialise the draw control and pass it the FeatureGroup of editable layers
+            var drawControl = new L.Control.Draw({
+                draw:{
+                    polyline: false,
+                    polygon:false,
+                    marker: false
+                },
+                edit: {
+                    featureGroup: drawnItems,
+                    edit: {
+                      moveMarkers: false
+                    }
+                }
+            });
+
+            map.addControl(drawControl);
+
+        });
+    
     }
 
 
@@ -193,8 +285,10 @@
             Maybe there is a better way. bringToFront() doesn't seem to work here.
             Removing and adding works.
         */
-        map.removeLayer(osmb);
-        map.addLayer(osmb);
+        leafletData.getMap().then(function(map) {
+            map.removeLayer(three_d_layer);
+            map.addLayer(three_d_layer);
+        });
     }
 
 
@@ -213,14 +307,31 @@
 
     function countryClick(country, event) {
         leafletData.getMap().then(function(map) {
-            map.fitBounds(country.getBounds());
+            var new_bounds=country.getBounds();
+
+            var country_width=Math.abs(new_bounds.getNorthEast().lng-new_bounds.getNorthWest().lng);
+            var country_height=Math.abs(new_bounds.getNorthEast().lng-new_bounds.getSouthEast().lng);
+            var offset=Math.abs(90-country_width)*0.03;
+
+            map.fitBounds([[new_bounds.getNorthEast().lat,new_bounds.getNorthEast().lng-1],
+                           [new_bounds.getSouthWest().lat,new_bounds.getSouthWest().lng-1]]);
+            
+            showSidebar();
         });
+    }
+    var showing=false;
+    function showSidebar(){
+        if(showing==false){
+            document.getElementById('homeTab').click();  
+            showing=true;
+        }
+        
     }
 
     /*
         Mouse over function, called from the Leaflet Map Events
     */
-    
+
     function countryMouseover(feature, leafletEvent) {
         var layer = leafletEvent.target;
         layer.setStyle({
@@ -230,7 +341,6 @@
         });
         layer.bringToFront();
         $scope.selectedCountry = feature;
-        console.log(feature);
     }
 
     /*
@@ -257,6 +367,94 @@
             dashArray: '3',
             fillOpacity: 0.1
         };
+    }
+
+    function initTimelineFirstVersion(map){
+
+    leafletData.getMap().then(function(map) {
+                // Get start/end times
+            var startTime = new Date(demoTracks[0].properties.time[0]);
+            var endTime = new Date(demoTracks[0].properties.time[demoTracks[0].properties.time.length - 1]);
+
+            // Create a DataSet with data
+            var timelineData = new vis.DataSet([{ start: startTime, end: endTime, content: '' }]);
+
+            // Set timeline options
+            var timelineOptions = {
+              "width":  "100%",
+              "height": "120px",
+              "style": "box",
+              "axisOnTop": true,
+              "showCustomTime":true
+            };
+
+            // Setup timeline
+            var timeline = new vis.Timeline(document.getElementById('timeline'), timelineData, timelineOptions);
+                
+            // Set custom time marker (blue)
+            timeline.setCustomTime(startTime);
+
+             // Playback options
+            var playbackOptions = {
+
+                playControl: true,
+                dateControl: true,
+                
+                // layer and marker options
+                layer : {
+                    pointToLayer : function(featureData, latlng) {
+                        var result = {};
+                        
+                        if (featureData && featureData.properties && featureData.properties.path_options) {
+                            result = featureData.properties.path_options;
+                        }
+                        
+                        if (!result.radius){
+                            result.radius = 5;
+                        }
+                        
+                        return new L.CircleMarker(latlng, result);
+                    }
+                },
+                
+                marker: { 
+                    getPopup: function(featureData) {
+                        var result = '';
+                        
+                        if (featureData && featureData.properties && featureData.properties.title) {
+                            result = featureData.properties.title;
+                        }
+                        
+                        return result;
+                    }
+                }
+                
+            };
+                
+            // Initialize playback
+            var playback = new L.Playback(map, null, onPlaybackTimeChange, playbackOptions);
+
+            playback.setData(demoTracks);    
+            playback.addData(blueMountain);
+
+            // Uncomment to test data reset;
+            //playback.setData(blueMountain);    
+
+            // Set timeline time change event, so cursor is set after moving custom time (blue)
+            timeline.on('timechange', onCustomTimeChange);    
+
+            // A callback so timeline is set after changing playback time
+            function onPlaybackTimeChange (ms) {
+                timeline.setCustomTime(new Date(ms));
+            };
+
+            // 
+            function onCustomTimeChange(properties) {
+                if (!playback.isPlaying()) {
+                    playback.setCursor(properties.time.getTime());
+                }        
+            }
+        });
     }
 
     

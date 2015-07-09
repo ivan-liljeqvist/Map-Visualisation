@@ -9,6 +9,12 @@
     "angular-leaflet-directive":"",
     "world-flags-sprite":"*",
     "Leaflet.utfgrid": "danzel/Leaflet.utfgrid",
-    "leaflet.markercluster":"*"
+    "leaflet.markercluster":"*",
+    "leaflet-draw":"*",
+    "LeafletPlayback":"*",
+    "Leaflet.awesome-markers":"*",
+    "vis":"3.12.0",
+    "moment":"*",
+    "sidebar-v2":"*"
   }
 }
