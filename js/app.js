@@ -2,12 +2,25 @@
 
  app.controller('MapController', [ "$scope", "$http","leafletData", function($scope, $http,leafletData) {
 
+    $scope.zoomIn = function() {
+        leafletData.getMap().then(function(map) {
+            map.setZoom(map.getZoom()+1);
+        });
+    }
+
+    $scope.zoomOut = function() {
+        leafletData.getMap().then(function(map) {
+            map.setZoom(map.getZoom()-1);
+        });
+    }
+
     /*
         VARIABLES THAT WILL BE USED FOR THE MAP.
     */
 
     var geoJSON;
     var three_d_layer;
+    var sidebar;
 
     /*
         Colors that will be used to color the countries.
@@ -108,8 +121,19 @@
         },
         controls: {
             draw: {}
+        },
+        markers: {
+            osloMarker: {
+                lat: 59.91,
+                lng: 10.75,
+                message: "I want to travel here!",
+                focus: true,
+                draggable: false
+            }
         }
     });
+
+  
 
 
     /*
@@ -123,11 +147,13 @@
         initLayers();
         //init buttons on the left side
         initLayerButtons();
-        initDrawControlls();
+        
 
         leafletData.getMap().then(function(map) {
-            var sidebar = L.control.sidebar('sidebar').addTo(map);
+            sidebar = L.control.sidebar('sidebar').addTo(map);
         });
+
+        initDrawControlls();
     
         initTimelineFirstVersion();
         
@@ -139,7 +165,7 @@
 
     function initLayers(){
 
-        $.ajax({
+        /*$.ajax({
             dataType: "json",
             url: "../geo/cities-large.geojson",
             success: function(data) {
@@ -153,6 +179,14 @@
 
                                 });
 
+        
+
+        }}).error(function() {});*/
+
+        initAllLayers();
+    }
+
+    function initAllLayers(){
         leafletData.getMap().then(function(map) {
             map.options.closePopupOnClick = false;
 
@@ -175,13 +209,8 @@
             three_d_layer = new OSMBuildings(map).set(geoJSON);
 
             bring3DToFront();
-
-             
-
                     
         });
-
-        }}).error(function() {});
     }
 
     /*
@@ -201,7 +230,7 @@
                 $(".leaflet-zoom-hide").css("pointer-events", "none");
             }).addTo( map ); 
 
-            L.easyButton('fa fa-star-half-o fa-2x', function(btn, map){
+            L.easyButton('fa fa-server', function(btn, map){
                 map.addLayer(shadowLayer);
                 map.removeLayer(heatLayer);
 
@@ -209,7 +238,7 @@
                 bring3DToFront();
             }).addTo( map ); 
 
-            L.easyButton('fa fa-star-half-o fa-2x', function(btn, map){
+            L.easyButton('fa fa-wifi', function(btn, map){
                 map.removeLayer(shadowLayer);
                 map.removeLayer(heatLayer);
 
@@ -319,13 +348,9 @@
             showSidebar();
         });
     }
-    var showing=false;
+
     function showSidebar(){
-        if(showing==false){
-            document.getElementById('homeTab').click();  
-            showing=true;
-        }
-        
+        sidebar.open("home");
     }
 
     /*
@@ -483,5 +508,26 @@
                 selectedCountry: {}
             });
         });
+
+        angular.extend($scope, {
+            markers: {
+                osloMarker: {
+                    lat: 59.91,
+                    lng: 10.75,
+                    message: "I want to travel here!",
+                    focus: true,
+                    draggable: false
+                },
+                swedenMarker: {
+                    lat: 59.91,
+                    lng: 7.75,
+                    message: "I ssswant to travel here!",
+                    focus: true,
+                    draggable: false
+                }
+            }
+        });
+
+
     });
 }]);

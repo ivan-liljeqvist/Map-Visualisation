@@ -1,5 +1,13 @@
+.leaflet-top{
+  margin-top:50px;
+  margin-left:6px;
+}
+.leaflet-left {
+  z-index:400;
+}
 #sidebar{
   height:80%;
+  z-index:20;
 }
 .sidebar {
   position: absolute;

@@ -4,13 +4,13 @@
     <title></title>
 
 	<!-- bower:css -->
-	<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
 	<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
 	<link rel="stylesheet" href="bower_components/world-flags-sprite/stylesheets/flags32.css" />
 	<link rel="stylesheet" href="bower_components/leaflet-dist/leaflet.css" />
 	<link rel="stylesheet" href="bower_components/leaflet-draw/dist/leaflet.draw.css" />
 	<link rel="stylesheet" href="bower_components/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css" />
 	<link rel="stylesheet" href="bower_components/vis/dist/vis.min.css" />
+	<link rel="stylesheet" href="bower_components/components-font-awesome/css/font-awesome.css" />
 	<!-- endbower -->
 	<!--bower dependencies without bower meta -->
 	<link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css"></script>
@@ -31,18 +31,14 @@
 	<div id="sidebar" class="sidebar collapsed">
         <!-- Nav tabs -->
         <ul class="sidebar-tabs" role="tablist">
-            <li><a href="#home" id="homeTab" role="tab"><i class="fa fa-bars"></i></a></li>
-            <li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
-            <li><a href="#messages" role="tab"><i class="fa fa-envelope"></i></a></li>
-            <li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+            <li><a href="#home" id="homeTab" role="tab" ng-click="toggleSidebar()"><i class="fa fa-bars"></i></a></li>
         </ul>
+
 
         <!-- Tab panes -->
         <div class="sidebar-content active">
             <div class="sidebar-pane" id="home">
-                <h1>{{ selectedCountry.properties.name || 'No country'}}</h1>
-
-                <p class="lorem">{{ selectedCountry.properties.name || 'No country'}} is awesome</p>
+	        
                 
             </div>
             <!--
@@ -59,7 +55,8 @@
 				 events="events" 
 				 legend="legend" 
 				 geojson="geojson" 
-				 defaults="defaults">
+				 defaults="defaults"
+				 markers="markers">
 		 </leaflet>
 	
 		<!--country name popup -->
