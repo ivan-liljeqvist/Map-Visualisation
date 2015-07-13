@@ -39,6 +39,8 @@
         <div class="sidebar-content active">
             <div class="sidebar-pane" id="home">
 	        
+	        	<br><br><br><br>
+	        	Graphs and stats depending on the context.
                 
             </div>
             <!--
@@ -62,8 +64,13 @@
 		<!--country name popup -->
 		<div id="timeline"></div>
 		<div class="info worldmap country f32">
+
         <div ng-show="selectedCountry" class="flag" ng-class="countries[selectedCountry.id]['alpha-2']|lowercase"></div>
-        {{ selectedCountry.properties.name || 'No country'}}
+        <span style="font-family:Calibri;">
+        	{{ selectedCountry.properties.name || 'No country'}}
+    	</span>
+
+
 
 
       </div>

@@ -19,6 +19,7 @@
     */
 
     var geoJSON;
+    var geoJSONTwo;
     var three_d_layer;
     var sidebar;
 
@@ -29,7 +30,7 @@
     var continentProperties= {
         "009": {
             name: 'Oceania',
-            colors: [ '#CC0066', '#993366', '#990066', '#CC3399', '#CC6699' ]
+            colors: [ '#006699', '#336666', '#003366', '#3399CC', '#6699CC' ]
         },
         "019": {
             name: 'America',
@@ -37,15 +38,15 @@
         },
         "150": {
             name: 'Europe',
-            colors: [ '#CC0066', '#993366', '#990066', '#CC3399', '#CC6699','#FF0000','#FFCC00', '#CC9933', '#999900', '#FFCC33', '#FFCC66','#00CC00', '#339933', '#009900', '#33FF33', '#66FF66', '#CC3333', '#990000', '#FF3333', '#FF6666','#006699', '#336666', '#003366', '#3399CC', '#6699CC' ]
+            colors: [ '#006699', '#336666', '#003366', '#3399CC', '#6699CC' ]
         },
         "002": {
             name: 'Africa',
-            colors: [ '#00CC00', '#339933', '#009900', '#33FF33', '#66FF66' ]
+            colors: [ '#006699', '#336666', '#003366', '#3399CC', '#6699CC' ]
         },
         "142": {
             name: 'Asia',
-            colors: [ '#FFCC00', '#CC9933', '#999900', '#FFCC33', '#FFCC66' ]
+            colors: [ '#006699', '#336666', '#003366', '#3399CC', '#6699CC' ]
         },
     };
 
@@ -123,17 +124,33 @@
             draw: {}
         },
         markers: {
-            osloMarker: {
+            /*osloMarker: {
                 lat: 59.91,
                 lng: 10.75,
                 message: "I want to travel here!",
                 focus: true,
                 draggable: false
-            }
+            }*/
         }
     });
 
-  
+    var three_d_animation_frame=1;
+
+    function startAnimatingThreeD(){
+        setInterval(function(){
+            
+            if(three_d_animation_frame==1){
+                three_d_layer.set(geoJSONTwo);
+            }
+            else if(three_d_animation_frame==2){
+                three_d_layer.set(geoJSON);
+                three_d_animation_frame=0;
+            }
+
+            three_d_animation_frame++;
+            
+        }, 3000);
+    }
 
 
     /*
@@ -159,15 +176,21 @@
         
     });
 
+    //load second dummy json
+    $.getJSON("../geo/3d_data2.json",function(json){
+        geoJSONTwo=json;
+        startAnimatingThreeD();
+    });
+
     /*
         Heatmap and Shadowmap
     */
 
     function initLayers(){
 
-        /*$.ajax({
+        $.ajax({
             dataType: "json",
-            url: "../geo/cities-large.geojson",
+            url: "../geo/cities-small.geojson",
             success: function(data) {
                 $(data.features).each(function(key, data) {
                                     //district_boundary.addData(data);
@@ -177,13 +200,14 @@
                                     //searchData.push({"loc":data.geometry.coordinates,"title":fakeOperators[Math.floor(Math.random()*fakeOperators.length)]+" Telecom Tower "+count});
                                     heatData.push({"lat":data.geometry.coordinates[0],"lng":data.geometry.coordinates[1],"count":10});
 
+                                    initAllLayers();
                                 });
 
         
 
-        }}).error(function() {});*/
+        }}).error(function() {});
 
-        initAllLayers();
+        
     }
 
     function initAllLayers(){
@@ -207,6 +231,15 @@
 
             //add 3D layer
             three_d_layer = new OSMBuildings(map).set(geoJSON);
+
+            var popup;
+            three_d_layer.click(function(e) {
+                console.log("!");
+              popup = L.popup()
+                .setLatLng(L.latLng(e.lat, e.lon))
+                .setContent('')
+                .openOn(map);
+            });
 
             bring3DToFront();
                     
@@ -390,7 +423,7 @@
             opacity: 1,
             color: 'white',
             dashArray: '3',
-            fillOpacity: 0.1
+            fillOpacity: 0.4
         };
     }
 
@@ -511,7 +544,7 @@
 
         angular.extend($scope, {
             markers: {
-                osloMarker: {
+                /*osloMarker: {
                     lat: 59.91,
                     lng: 10.75,
                     message: "I want to travel here!",
@@ -524,7 +557,7 @@
                     message: "I ssswant to travel here!",
                     focus: true,
                     draggable: false
-                }
+                }*/
             }
         });
 
